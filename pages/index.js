@@ -12,6 +12,11 @@ export default function Home() {
 
       <main>
         <Header title="Dog si Phanie" /> 
+
+        {/* Add image below */}
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+          <img src="/dog.JPG" alt="Dog si Phanie" style={{ maxWidth: '100%', height: 'auto', borderRadius: '12px' }} />
+        </div>
       </main>
 
       <Footer />
