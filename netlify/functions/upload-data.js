@@ -1,52 +1,57 @@
-const fs = require('fs')
-const path = require('path')
+const axios = require('axios');
 
-const dataFile = path.resolve(__dirname, 'data.json')
+const BIN_ID = process.env.JSONBIN_BIN_ID || '6830547e8561e97a501a7a54';
+const API_KEY = process.env.JSONBIN_API_KEY || '$2a$10$IXRMbunUtndT4UBf7rbRveIFEc3UJuey0nbl/8ADpZUKoGJeKEibC';
 
-// Ensure the data file exists
-if (!fs.existsSync(dataFile)) {
-  fs.writeFileSync(dataFile, JSON.stringify({
-    lat: 14.5995,
-    lng: 120.9842,
-    sensor: 32.5
-  }, null, 2))
-}
+exports.handler = async function (event) {
+  const headers = {
+    'Content-Type': 'application/json',
+    'X-Master-Key': API_KEY,
+  };
 
-exports.handler = async function (event, context) {
   if (event.httpMethod === 'POST') {
+    const data = JSON.parse(event.body);
+
     try {
-      const body = JSON.parse(event.body)
-
-      const updatedData = {
-        lat: body.lat,
-        lng: body.lng,
-        sensor: body.sensor
-      }
-
-      fs.writeFileSync(dataFile, JSON.stringify(updatedData, null, 2))
+      await axios.put(
+        `https://api.jsonbin.io/v3/b/${BIN_ID}`,
+        data,
+        { headers }
+      );
 
       return {
         statusCode: 200,
-        body: JSON.stringify({ message: "Data updated" }),
-      }
+        body: JSON.stringify({ message: 'Data updated' }),
+      };
     } catch (err) {
       return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "Invalid JSON", error: err.message }),
-      }
+        statusCode: 500,
+        body: JSON.stringify({ error: err.message }),
+      };
     }
   }
 
   if (event.httpMethod === 'GET') {
-    const content = fs.readFileSync(dataFile, 'utf8')
-    return {
-      statusCode: 200,
-      body: content,
+    try {
+      const response = await axios.get(
+        `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,
+        { headers }
+      );
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify(response.data.record),
+      };
+    } catch (err) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: err.message }),
+      };
     }
   }
 
   return {
     statusCode: 405,
-    body: "Method Not Allowed",
-  }
-}
+    body: 'Method Not Allowed',
+  };
+};
