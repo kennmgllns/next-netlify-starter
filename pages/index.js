@@ -6,7 +6,7 @@ export default function HomePage() {
 
   useEffect(() => {
     async function loadData() {
-      const res = await fetch('https://api.jsonbin.io/v3/b/6830547e8561e97a501a7a54', {
+      const res = await fetch('https://api.jsonbin.io/v3/b/68305ba38561e97a501a7dd9', {
         headers: {
           'X-Master-Key': '$2a$10$IXRMbunUtndT4UBf7rbRveIFEc3UJuey0nbl/8ADpZUKoGJeKEibC' // or move to backend to hide this
         }
