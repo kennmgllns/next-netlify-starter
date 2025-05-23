@@ -23,7 +23,7 @@ export default function HomePage() {
 
   return (
     <div>
-      <h1>Sensor Map</h1>
+      <h1>Sensor Data</h1>
       <p>Lat: {data.lat}, Lng: {data.lng}, Sensor: {data.sensor}</p>
       {/* Render map component here */}
     </div>
