@@ -6,10 +6,10 @@ export default function HomePage() {
 
   useEffect(() => {
     async function loadData() {
-      const res = await fetch('https://api.jsonbin.io/v3/b/68305ba38561e97a501a7dd9', {
+      const res = await fetch('https://api.jsonbin.io/v3/b/68305ba38561e97a501a7dd9/latest', {
         headers: {
           'X-Master-Key': '$2a$10$Ym6dVcpM29hxIDPHbVleFef8yt5NhihdKFfmjTsEPbEDzyzSPfIrq' // or move to backend to hide this
-        }
+        },cache: 'no-store'
       });
 
       const json = await res.json();
