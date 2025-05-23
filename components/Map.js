@@ -1,25 +1,24 @@
 import { useEffect, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
-import L from 'leaflet'
-
-const icon = new L.Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41]
-})
 
 export default function MapView() {
-  const [position, setPosition] = useState([14.5995, 120.9842])
+  const [sensors, setSensors] = useState([])
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('/.netlify/functions/upload-data')
-        const data = await res.json()
-        console.log("Fetched data:", data)
-        if (data.lat && data.lng) {
-          setPosition([data.lat, data.lng])
+        const res = await fetch('https://api.jsonbin.io/v3/b/68305ba38561e97a501a7dd9/latest', {
+          headers: {
+            'X-Master-Key': '$2a$10$Ym6dVcpM29hxIDPHbVleFef8yt5NhihdKFfmjTsEPbEDzyzSPfIrq'
+          },
+          cache: 'no-store'
+        });
+        const json = await res.json();
+        if (Array.isArray(json.record)) {
+          setSensors(json.record)
+        } else {
+          console.error("Expected array but got:", json.record)
         }
       } catch (err) {
         console.error(err)
@@ -27,20 +26,37 @@ export default function MapView() {
     }
 
     fetchData()
-    const interval = setInterval(fetchData, 5000)
-
-    return () => clearInterval(interval)
   }, [])
 
   return (
-    <MapContainer center={position} zoom={13} style={{ height: "500px", width: "100%" }}>
+    <MapContainer center={[14.5995, 120.9842]} zoom={13} style={{ height: "500px", width: "100%" }}>
       <TileLayer
         attribution='&copy; OpenStreetMap contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
       />
-      <Marker position={position} icon={icon}>
-        <Popup>Sensor location</Popup>
-      </Marker>
+      {sensors.map((sensor, idx) => {
+        const getColor = (value) => {
+          if (value < 20) return "#00ff00"
+          if (value < 50) return "#ffff00"
+          if (value < 80) return "#ff9900"
+          return "#ff0000"
+        }
+
+        const color = getColor(sensor.value)
+
+        return (
+          <CircleMarker
+            key={idx}
+            center={[sensor.lat, sensor.lng]}
+            radius={10}
+            color={color}
+            fillColor={color}
+            fillOpacity={0.8}
+          >
+            <Popup>Value: {sensor.value}</Popup>
+          </CircleMarker>
+        )
+      })}
     </MapContainer>
   )
 }
