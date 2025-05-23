@@ -1,30 +1,31 @@
+// pages/index.js or a component
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 
-export default function Home() {
-  const [coords, setCoords] = useState({ lat: 0, lng: 0, sensor: null });
+export default function HomePage() {
+  const [data, setData] = useState(null);
 
   useEffect(() => {
-    async function fetchCoords() {
-      const res = await fetch('/.netlify/functions/upload-data');
-      const data = await res.json();
-      setCoords(data);
+    async function loadData() {
+      const res = await fetch('https://api.jsonbin.io/v3/b/6830547e8561e97a501a7a54', {
+        headers: {
+          'X-Master-Key': '$2a$10$IXRMbunUtndT4UBf7rbRveIFEc3UJuey0nbl/8ADpZUKoGJeKEibC' // or move to backend to hide this
+        }
+      });
+
+      const json = await res.json();
+      setData(json.record);
     }
 
-    fetchCoords();
+    loadData();
   }, []);
 
+  if (!data) return <p>Loading...</p>;
+
   return (
-    <div style={{ height: '100vh', width: '100%' }}>
-      <MapContainer center={[coords.lat, coords.lng]} zoom={13} style={{ height: '100%', width: '100%' }}>
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <Marker position={[coords.lat, coords.lng]}>
-          <Popup>Sensor: {coords.sensor}</Popup>
-        </Marker>
-      </MapContainer>
+    <div>
+      <h1>Sensor Map</h1>
+      <p>Lat: {data.lat}, Lng: {data.lng}, Sensor: {data.sensor}</p>
+      {/* Render map component here */}
     </div>
   );
 }

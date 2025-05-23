@@ -1,57 +1,23 @@
-const axios = require('axios');
+// pages/api/upload-data.js
 
-const BIN_ID = process.env.JSONBIN_BIN_ID || '6830547e8561e97a501a7a54';
-const API_KEY = process.env.JSONBIN_API_KEY || '$2a$10$IXRMbunUtndT4UBf7rbRveIFEc3UJuey0nbl/8ADpZUKoGJeKEibC';
+export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).end();
 
-exports.handler = async function (event) {
-  const headers = {
-    'Content-Type': 'application/json',
-    'X-Master-Key': API_KEY,
-  };
+  const { lat, lng, sensor } = req.body;
 
-  if (event.httpMethod === 'POST') {
-    const data = JSON.parse(event.body);
+  const response = await fetch('https://api.jsonbin.io/v3/b/6830547e8561e97a501a7a54', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Master-Key': '$2a$10$IXRMbunUtndT4UBf7rbRveIFEc3UJuey0nbl/8ADpZUKoGJeKEibC', // Get from JSONBin
+      'X-Bin-Versioning': 'false'
+    },
+    body: JSON.stringify({ lat, lng, sensor })
+  });
 
-    try {
-      await axios.put(
-        `https://api.jsonbin.io/v3/b/${BIN_ID}`,
-        data,
-        { headers }
-      );
-
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ message: 'Data updated' }),
-      };
-    } catch (err) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: err.message }),
-      };
-    }
+  if (!response.ok) {
+    return res.status(500).json({ message: 'Failed to update JSONBin' });
   }
 
-  if (event.httpMethod === 'GET') {
-    try {
-      const response = await axios.get(
-        `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,
-        { headers }
-      );
-
-      return {
-        statusCode: 200,
-        body: JSON.stringify(response.data.record),
-      };
-    } catch (err) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: err.message }),
-      };
-    }
-  }
-
-  return {
-    statusCode: 405,
-    body: 'Method Not Allowed',
-  };
-};
+  res.status(200).json({ message: 'Data updated' });
+}
