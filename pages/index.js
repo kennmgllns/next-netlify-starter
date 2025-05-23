@@ -8,7 +8,7 @@ export default function HomePage() {
     async function loadData() {
       const res = await fetch('https://api.jsonbin.io/v3/b/68305ba38561e97a501a7dd9', {
         headers: {
-          'X-Master-Key': '$2a$10$IXRMbunUtndT4UBf7rbRveIFEc3UJuey0nbl/8ADpZUKoGJeKEibC' // or move to backend to hide this
+          'X-Master-Key': '$2a$10$Ym6dVcpM29hxIDPHbVleFef8yt5NhihdKFfmjTsEPbEDzyzSPfIrq' // or move to backend to hide this
         }
       });
 
