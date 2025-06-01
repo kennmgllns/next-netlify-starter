@@ -10,7 +10,7 @@ export default function MapView() {
   const [outerHull, setOuterHull] = useState(null);
   const [points, setPoints] = useState([]);
 
-  useEffect(() => {
+  useEffect(() => { 
     const fetchData = async () => {
       try {
         const res = await fetch(
