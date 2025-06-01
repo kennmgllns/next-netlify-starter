@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 
-const MapView = dynamic(() => import('../components/map'), { ssr: false });
+const MapView = dynamic(() => import('../components/Map'), { ssr: false });
 
 export default function HomePage() {
   const [sensors, setSensors] = useState([]);
